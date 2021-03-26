@@ -2,29 +2,37 @@ package com.example.recipes.ui.fragments.recipes
 
 import android.os.Bundle
 import android.util.Log
+import android.view.*
+import android.widget.SearchView
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.recipes.viewmodels.MainViewModel
 import com.example.recipes.R
 import com.example.recipes.adapters.RecipesAdapter
 import com.example.recipes.databinding.FragmentRecipesBinding
+import com.example.recipes.util.NetworkListener
 import com.example.recipes.util.NetworkResult
 import com.example.recipes.util.observeOnce
 import com.example.recipes.viewmodels.RecipesViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_recipes.view.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class  RecipesFragment : Fragment() {
+@ExperimentalCoroutinesApi
+class  RecipesFragment : Fragment() , SearchView.OnQueryTextListener {
+
+    private lateinit var networkListener: NetworkListener
+
+    private val args by navArgs<RecipesFragmentArgs>()
 
     private var _binding : FragmentRecipesBinding ?= null
     private val binding get() = _binding!!
@@ -48,12 +56,33 @@ class  RecipesFragment : Fragment() {
         binding.lifecycleOwner = this
         binding.mainViewModel = mainViewModel
 
+        setHasOptionsMenu(true)
+
 
         setupRecyclerView()
-        readDatabase()
+
+        recipesViewModel.readBackOnline.observe(viewLifecycleOwner, {
+            recipesViewModel.backOnline = it
+        })
+
+        lifecycleScope.launch {
+            networkListener = NetworkListener()
+            networkListener.checkNetworkAvailability(requireContext())
+                .collect { status ->
+                    Log.d("NetworkListener", status.toString())
+                    recipesViewModel.networkStatus = status
+                    recipesViewModel.showNetworkStatus()
+                    readDatabase()
+                }
+        }
 
         binding.recipesFab.setOnClickListener {
-            findNavController().navigate(R.id.action_recipesFragment_to_recipesBottomSheet)
+            if(recipesViewModel.networkStatus){
+                findNavController().navigate(R.id.action_recipesFragment_to_recipesBottomSheet)
+            }else{
+                recipesViewModel.showNetworkStatus()
+            }
+
         }
 
         return binding.root
@@ -65,10 +94,19 @@ class  RecipesFragment : Fragment() {
         showShimmerEffect()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.recipes_menu, menu)
+
+        val search = menu.findItem(R.id.menu_search)
+        val searchView = search.actionView as? SearchView
+        searchView?.isSubmitButtonEnabled = true
+        searchView?.setOnQueryTextListener(this)
+    }
+
     private fun readDatabase() {
         lifecycleScope.launch {
             mainViewModel.readRecipes.observeOnce(viewLifecycleOwner, {database ->
-                if(database.isNotEmpty()){
+                if(database.isNotEmpty() && !args.backFromBottomSheet){
                     Log.d("RecipesFragment", "readDatabase called!")
                     mAdapter.setData(database[0].foodRecipe)
                     hideShimmerEffect()
@@ -125,6 +163,14 @@ class  RecipesFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        return true
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        return true
     }
 
 }
