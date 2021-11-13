@@ -6,13 +6,13 @@
     <data>
         <variable
             name="mainViewModel"
-            type="com.example.recipes.viewmodels.MainViewModel" />
+            type="com.example.foody.viewmodels.MainViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/lightGray"
+        android:background="@color/backgroundColor"
         tools:context=".ui.fragments.recipes.RecipesFragment">
 
         <com.todkars.shimmer.ShimmerRecyclerView
@@ -31,7 +31,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/recipesFab"
+            android:id="@+id/recipes_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="24dp"
@@ -48,7 +48,7 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             readApiResponse="@{mainViewModel.recipesResponse}"
-            readDatabaseResponse="@{mainViewModel.readRecipes}"
+            readDatabase="@{mainViewModel.readRecipes}"
             android:alpha="0.5"
             android:src="@drawable/ic_sad"
             android:visibility="invisible"
@@ -62,12 +62,11 @@
             android:id="@+id/error_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:alpha="0.5"
-            android:text="No Internet Connection."
-            android:textSize="18sp"
             readApiResponse2="@{mainViewModel.recipesResponse}"
             readDatabase2="@{mainViewModel.readRecipes}"
+            android:layout_marginTop="8dp"
+            android:alpha="0.5"
+            android:textSize="18sp"
             android:textStyle="bold"
             android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="@+id/error_imageView"
