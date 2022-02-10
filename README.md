@@ -1,5 +1,5 @@
 # App's Screen Shots
-![Screenshot_20220210_140058_com example foody](https://user-images.githubusercontent.com/75037160/153368659-ff98a483-3604-46d6-81de-ffea3fa0f600.jpg)
+<img src="https://github.com/tushaar24/recipes" width ="200"  height="400" />
 ![Screenshot_20220210_135758_com example foody](https://user-images.githubusercontent.com/75037160/153368576-8054fffb-763c-499f-bfb0-1dffe0ab6819.jpg)
 ![Screenshot_20220210_135830_com example foody](https://user-images.githubusercontent.com/75037160/153369468-868bf0b3-ce2a-4069-9466-d586f531710a.jpg)
 ![Screenshot_20220210_135812_com example foody](https://user-images.githubusercontent.com/75037160/153368862-cc496f78-dc96-4aae-949b-f3326cca2a7c.jpg)
